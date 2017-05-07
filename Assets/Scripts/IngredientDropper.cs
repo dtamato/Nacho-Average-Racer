@@ -5,7 +5,7 @@ using UnityEngine;
 public class IngredientDropper : MonoBehaviour {
 
 [Header ("Items")]
-[SerializeField]GameObject nachoObject;
+[SerializeField]GameObject ingredientObject;
 
 [Header ("DropParameters")]
 [SerializeField] int numberDropped;
@@ -21,7 +21,7 @@ public class IngredientDropper : MonoBehaviour {
     public void DropStuff()
     {
         GameObject droppedItem = new GameObject("droppedItem");
-        droppedItem = nachoObject;
+        droppedItem = ingredientObject;
     for (int i = 0; i< numberDropped; i++)
         {   
             Vector3 randomPoint = new Vector3(Random.Range(collider.bounds.min.x, collider.bounds.max.x), Random.Range(collider.bounds.min.y, collider.bounds.max.y), Random.Range(collider.bounds.min.z, collider.bounds.max.z));
