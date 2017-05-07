@@ -59,7 +59,7 @@ public class Ingredient : MonoBehaviour {
 				GameObject newScoreCanvas = Instantiate (scoreCanvasPrefab, this.transform.position + Vector3.up, Quaternion.identity) as GameObject;
 				newScoreCanvas.GetComponentInChildren<ScoreCanvas> ().SetSprite (isGood);
 
-				other.GetComponentInChildren<PlateController> ().AddIngredient (inNachosSprite);
+				other.GetComponentInChildren<PlateController> ().AddIngredient (inNachosSprite, isGood);
 				this.transform.GetChild (0).gameObject.SetActive (false);
 				this.transform.position = Vector3.zero;
 

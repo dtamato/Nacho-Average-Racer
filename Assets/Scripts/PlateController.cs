@@ -9,6 +9,7 @@ public class PlateController : MonoBehaviour {
 	
 	[SerializeField] SpriteRenderer silhoutteImage;
 	[SerializeField] Transform[] spawnTransforms;
+	[SerializeField] GameController gameController;
 
 	[Header("Ingredients")]
 	[SerializeField] GameObject chipsPrefab;
@@ -19,6 +20,7 @@ public class PlateController : MonoBehaviour {
 
 	List<GameObject> ingredientsNeeded;
 	List<GameObject> toppingsList;
+	bool goodPlate;
 
 	void Awake () {
 
@@ -27,7 +29,7 @@ public class PlateController : MonoBehaviour {
 	}
 
 	void Initialize () {
-
+		
 		ingredientsNeeded = new List<GameObject> ();
 		toppingsList = new List<GameObject> ();
 
@@ -42,6 +44,8 @@ public class PlateController : MonoBehaviour {
 
 			Destroy(this.transform.GetChild(i).gameObject);
 		}
+
+		goodPlate = true;
 	}
 
 	public void SetupPlate () {
@@ -93,7 +97,7 @@ public class PlateController : MonoBehaviour {
 
 		if (ingredientsNeeded.Count > 0) {
 
-			Debug.Log ("Next Ingredient: " + ingredientsNeeded [ingredientsNeeded.Count - 1]);
+			//Debug.Log ("Next Ingredient: " + ingredientsNeeded [ingredientsNeeded.Count - 1]);
 			GameObject nextIngredient = ingredientsNeeded [ingredientsNeeded.Count - 1];
 			ingredientsNeeded.Remove (nextIngredient);
 
@@ -111,6 +115,17 @@ public class PlateController : MonoBehaviour {
 		}
 		else {
 
+			// Score plate
+			if (goodPlate) {
+
+				gameController.IncrementGoodNachos ();
+			}
+			else {
+
+				gameController.IncrementBadNachos ();
+			}
+
+			// Set up next plate
 			Initialize ();
 			SetupPlate ();
 		}
@@ -134,7 +149,7 @@ public class PlateController : MonoBehaviour {
 		return spawnTransform;
 	}
 
-	public void AddIngredient (Sprite inNachosSprite) {
+	public void AddIngredient (Sprite inNachosSprite, bool isGood) {
 
 		this.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = null;
 
@@ -145,6 +160,9 @@ public class PlateController : MonoBehaviour {
 		newIngredient.transform.SetParent (this.transform);
 		newIngredient.transform.localScale = 0.5f * Vector3.one;
 		newIngredient.name = inNachosSprite.name;
+		if (goodPlate && !isGood) { goodPlate = false; }
+		int scoreToAdd = isGood ? 100 : -100;
+		gameController.AddToScore (scoreToAdd);
 	}
 
 //	public void SpawnIngredients () {
