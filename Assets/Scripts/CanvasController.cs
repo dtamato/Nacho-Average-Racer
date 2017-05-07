@@ -6,6 +6,8 @@ using UnityEngine;
 public class CanvasController : MonoBehaviour {
 
     [SerializeField] GameObject mainMenu;
+    [SerializeField] GameObject game;
+    [SerializeField] float startGameDelay;
 
 	// Use this for initialization
 	void Start () {
@@ -19,5 +21,11 @@ public class CanvasController : MonoBehaviour {
 
     public void StartGame() {
         mainMenu.GetComponent<Animator>().SetTrigger("Move");
+        StartCoroutine(ShowGame());
+    }
+
+    IEnumerator ShowGame() {
+        yield return new WaitForSeconds(startGameDelay);
+        game.SetActive(true);
     }
 }
