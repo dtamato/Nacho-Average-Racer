@@ -27,13 +27,10 @@ public class RecipeBoxController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            ShowInstructions();
-        }
 	}
 
 
-    public void ShowInstructions() {
+    public void ShowInstructions(string ingredient) {
 
         int rand = 0;
         animator.enabled = true;
@@ -44,8 +41,7 @@ public class RecipeBoxController : MonoBehaviour {
         intsructionsText.text = recipeInstruction[rand];
 
         // Set the ingredient text and color
-        rand = Random.Range(0, ingredients.Length);
-        ingredientText.text = ingredients[rand];
+        ingredientText.text = ingredient;
         rand = Random.Range(0, ingredientTextColor.Length);
         ingredientText.color = ingredientTextColor[rand];
 

@@ -23,13 +23,18 @@ public class Ingredient : MonoBehaviour {
 	[SerializeField] GameObject opposingIngredient;
 	[SerializeField] GameObject scoreCanvasPrefab;
 
+    GameObject topRecipeBox;
+    GameObject bottomRecipeBox;
+
 	bool canDrag;
 
 
 	void Awake () {
 
 		ResetIngredient ();
-	}
+        topRecipeBox = GameObject.FindGameObjectWithTag("TopRecipe");
+        bottomRecipeBox = GameObject.FindGameObjectWithTag("BottomRecipe");
+    }
 
 	void OnMouseDrag () {
 
@@ -57,6 +62,14 @@ public class Ingredient : MonoBehaviour {
 				other.GetComponentInChildren<PlateController> ().AddIngredient (inNachosSprite);
 				this.transform.GetChild (0).gameObject.SetActive (false);
 				this.transform.position = Vector3.zero;
+
+                int rand = Random.Range(0, 2);
+                if (rand == 0) {
+                    bottomRecipeBox.GetComponent<RecipeBoxController>().ShowInstructions(ingredientName);
+                } else {
+                    topRecipeBox.GetComponent<RecipeBoxController>().ShowInstructions(ingredientName);
+                }
+
 				Camera.main.GetComponent<CameraEffects> ().StartCoroutine ("CameraCut");
 				Destroy (this.gameObject);
 			}
