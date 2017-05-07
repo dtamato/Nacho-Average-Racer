@@ -26,11 +26,11 @@ public class GameController : MonoBehaviour {
             int minutes = (int)(gameTime / 60);
             int seconds = 0;
             if (minutes > 0) {
-                Debug.Log("Found Minutes");
+                //Debug.Log("Found Minutes");
                 seconds = (int)(gameTime - (60 * minutes));
             }
             else {
-                Debug.Log("No Minutes");
+                //Debug.Log("No Minutes");
                 seconds = (int)gameTime;
             }
             timer.GetComponent<Text>().text = string.Format("{0:0}:{1:00}", minutes, seconds);

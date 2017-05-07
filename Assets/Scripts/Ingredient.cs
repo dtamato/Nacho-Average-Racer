@@ -2,21 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ExtraTopping { 
+public enum IngredientType { 
 
+	Chips,
+	FishHead,
 	Cheese, 
-	Tomatoes, 
-	Jalaps,
+	Carrots,
+	Tomatoes,
+	Marshmallows,
+	Jalapenos,
+	Pepperoni,
 	GreenOnions,
+	Pasta,
 	ToppingsCount
 };
+
+public enum ExtraTopping {
+
+	Cheese, 
+	Tomatoes,
+	Jalapenos,
+	GreenOnions,
+	ToppingsCount
+}
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Ingredient : MonoBehaviour {
 
 	[SerializeField] string ingredientName;
-	[SerializeField] bool isGood;
+	[SerializeField] IngredientType ingredientType;
 	[SerializeField] Sprite inNachosSprite;
 	[SerializeField] Sprite silhoutteSprite;
 	[SerializeField] GameObject droppedVersion;
@@ -56,19 +71,24 @@ public class Ingredient : MonoBehaviour {
 				canDrag = false;
 
 				GameObject newScoreCanvas = Instantiate (scoreCanvasPrefab, this.transform.position + Vector3.up, Quaternion.identity) as GameObject;
-				newScoreCanvas.GetComponentInChildren<ScoreCanvas> ().SetSprite (isGood);
 
-				other.GetComponentInChildren<PlateController> ().AddIngredient (droppedVersion, isGood);
+				bool ingredientsMatched = other.GetComponent<PlateController> ().isIngredientRight (ingredientType);
+				newScoreCanvas.GetComponentInChildren<ScoreCanvas> ().SetSprite (ingredientsMatched);
+
+				other.GetComponentInChildren<PlateController> ().AddIngredient (droppedVersion, ingredientsMatched);
 				this.transform.GetChild (0).gameObject.SetActive (false);
 				this.transform.position = Vector3.zero;
 
                 int rand = Random.Range(0, 2);
                 if (rand == 0) {
-                    bottomRecipeBox.GetComponent<RecipeBoxController>().ShowInstructions(ingredientName);
-                } else {
-                    topRecipeBox.GetComponent<RecipeBoxController>().ShowInstructions(ingredientName);
+					bottomRecipeBox.GetComponent<RecipeBoxController>().ShowInstructions(ingredientName.ToUpper());
+                } 
+				else {
+					topRecipeBox.GetComponent<RecipeBoxController>().ShowInstructions(ingredientName.ToUpper());
                 }
 
+				other.GetComponent<PlateController> ().ShowEnjoyText ();
+				other.GetComponent<PlateController> ().DeleteExistingBowls ();
 				Camera.main.GetComponent<CameraEffects> ().StartCoroutine ("CameraCut");
 				Destroy (this.gameObject);
 			}
@@ -77,7 +97,7 @@ public class Ingredient : MonoBehaviour {
 
 	public void ResetIngredient () {
 		canDrag = true;
-		this.transform.localScale = Random.Range (1f, 1.75f) * Vector3.one;
+		this.transform.localScale = Random.Range (1f, 1.5f) * Vector3.one;
 	}
 
 	public string GetIngredientName () {
@@ -93,5 +113,10 @@ public class Ingredient : MonoBehaviour {
 	public GameObject GetOpposingIngredient () {
 
 		return opposingIngredient;
+	}
+
+	public IngredientType GetIngredientType () {
+
+		return ingredientType;
 	}
 }

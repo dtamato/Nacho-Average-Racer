@@ -10,12 +10,14 @@ public class IngredientDropper : MonoBehaviour {
 [Header ("DropParameters")]
 [SerializeField] int numberDropped;
 
+[Header("References")]
+[SerializeField] GameObject plate;
 
     Collider collider;	
 
 	void Awake () {
         collider = GetComponent<Collider>();
-        //DropStuff();
+        DropStuff();
 	}
 	
     public void DropStuff()
@@ -25,7 +27,8 @@ public class IngredientDropper : MonoBehaviour {
     	for (int i = 0; i< numberDropped; i++)
         {   
             Vector3 randomPoint = new Vector3(Random.Range(collider.bounds.min.x, collider.bounds.max.x), Random.Range(collider.bounds.min.y, collider.bounds.max.y), Random.Range(collider.bounds.min.z, collider.bounds.max.z));
-            Instantiate(ingredientObject, randomPoint, Random.rotation);
+			GameObject newIngredient = Instantiate (ingredientObject, randomPoint, Random.rotation) as GameObject;
+			newIngredient.transform.SetParent (plate.transform);
         }
 
 		this.gameObject.SetActive (false);

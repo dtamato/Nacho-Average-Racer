@@ -8,7 +8,7 @@ public class FoodColourizer : MonoBehaviour {
         
         void Start ()
         {
-            GetComponent<MeshRenderer>().material = foodMat[Random.Range(0, 2)];
+            GetComponent<MeshRenderer>().material = foodMat[Random.Range(0, foodMat.Length)];
         }   
 
 }

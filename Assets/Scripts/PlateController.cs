@@ -11,6 +11,7 @@ public class PlateController : MonoBehaviour {
 	[SerializeField] Transform[] spawnTransforms;
 	[SerializeField] GameController gameController;
 	[SerializeField] IngredientDropper ingredientDropper;
+	[SerializeField] Animator andEnjoyAnimator;
 
 	[Header("Ingredients")]
 	[SerializeField] GameObject chipsPrefab;
@@ -21,6 +22,7 @@ public class PlateController : MonoBehaviour {
 
 	List<GameObject> ingredientsNeeded;
 	List<GameObject> toppingsList;
+	IngredientType ingredientRequired;
 	bool goodPlate;
 
 	void Awake () {
@@ -47,6 +49,7 @@ public class PlateController : MonoBehaviour {
 		}
 
 		goodPlate = true;
+		this.GetComponent<Animator>().SetBool("Slide", false);
 	}
 
 	public void SetupPlate () {
@@ -86,35 +89,44 @@ public class PlateController : MonoBehaviour {
 	}
 
 	public void ShowNextIngredient () {
-
+		//Debug.Log ("Showing next ingredient");
 		// Delete existing bowls
-		for (int i = 0; i < spawnTransforms.Length; i++) {
-
-			if (spawnTransforms[i].childCount > 0) {
-				
-				Destroy (spawnTransforms[i].GetChild (0).gameObject);
-			}
-		}
 
 		if (ingredientsNeeded.Count > 0) {
-
+			//Debug.Log ("Getting next ingredient");
 			//Debug.Log ("Next Ingredient: " + ingredientsNeeded [ingredientsNeeded.Count - 1]);
 			GameObject nextIngredient = ingredientsNeeded [ingredientsNeeded.Count - 1];
 			ingredientsNeeded.Remove (nextIngredient);
 
+			ingredientRequired = nextIngredient.GetComponent<Ingredient> ().GetIngredientType ();
 			silhoutteImage.sprite = nextIngredient.GetComponent<Ingredient> ().GetSilhoutteSprite ();
 
 			// Spawn required ingredient
-			GameObject newIngredient = Instantiate (nextIngredient, GetEmptySpawn ()) as GameObject;
+			GameObject newIngredient = Instantiate (nextIngredient, GetEmptySpawn()) as GameObject;
 			newIngredient.transform.localPosition = Vector3.zero;
 
 			// Spawn opposing ingredient
-			GameObject opposingIngredient = Instantiate (nextIngredient.GetComponent<Ingredient> ().GetOpposingIngredient (), GetEmptySpawn ()) as GameObject;
+			GameObject opposingIngredient = Instantiate (nextIngredient.GetComponent<Ingredient> ().GetOpposingIngredient (), GetEmptySpawn()) as GameObject;
 			opposingIngredient.transform.localPosition = Vector3.zero;
 
 			// Fill the rest of the spots?
+			for (int i = 0; i < spawnTransforms.Length; i++) {
+
+				if (spawnTransforms [i].childCount == 0 || (spawnTransforms[i].childCount > 0 && spawnTransforms[i].name == "Destroying")) {
+
+					//GameObject extraTopping = Instantiate (toppingsList[Random.Range(0, toppingsList.Count)], 15 * Vector3.one, Quaternion.identity) as GameObject;
+					GameObject extraTopping = Instantiate (toppingsList[Random.Range(0, toppingsList.Count)], spawnTransforms [i]) as GameObject;
+					extraTopping.transform.localPosition = Vector3.zero;
+				}
+			}
 		}
 		else {
+			
+			// Delete existing toppings
+			for (int i = 1; i < this.transform.childCount; i++) {
+
+				Destroy (this.transform.GetChild (i).gameObject);
+			}
 
 			// Score plate
 			if (goodPlate) {
@@ -132,6 +144,18 @@ public class PlateController : MonoBehaviour {
 		}
 	}
 
+	public void DeleteExistingBowls () {
+
+		for (int i = 0; i < spawnTransforms.Length; i++) {
+			//Debug.Log ("Checking bowl");
+			if (spawnTransforms[i].childCount > 0) {
+				spawnTransforms [i].transform.GetChild(0).name = "Destroying";
+				Destroy (spawnTransforms[i].GetChild (0).gameObject);
+				//spawnTransforms[i].GetChild(0).gameObject.SetActive(false);
+			}
+		}
+	}
+
 	Transform GetEmptySpawn () {
 
 		Transform spawnTransform = null;
@@ -140,7 +164,7 @@ public class PlateController : MonoBehaviour {
 
 			Transform randomSpawnTransform = spawnTransforms[Random.Range(0, spawnTransforms.Length)];
 
-			if(randomSpawnTransform.childCount == 0) {
+			if(randomSpawnTransform.childCount == 0 || (randomSpawnTransform.childCount > 0 && randomSpawnTransform.GetChild(0).name == "Destroying")) {
 
 				spawnTransform = randomSpawnTransform;
 			}
@@ -150,26 +174,38 @@ public class PlateController : MonoBehaviour {
 		return spawnTransform;
 	}
 
-	public void AddIngredient (GameObject ingredientDrop, bool isGood) {
+	public void AddIngredient (GameObject ingredientDrop, bool ingredientsMatched) {
 
 		this.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = null;
-
-//		GameObject newIngredient = new GameObject ();
-//		newIngredient.AddComponent(typeof(SpriteRenderer));
-//		newIngredient.GetComponent<SpriteRenderer> ().sprite = inNachosSprite;
-//		newIngredient.GetComponent<SpriteRenderer> ().sortingOrder = this.transform.childCount + 1;
-//		newIngredient.transform.SetParent (this.transform);
-//		newIngredient.transform.localScale = 0.5f * Vector3.one;
-//		newIngredient.name = inNachosSprite.name;
 
 		ingredientDropper.SetObject (ingredientDrop);
 		ingredientDropper.gameObject.SetActive (true);
 		ingredientDropper.DropStuff ();
 
-
-		if (goodPlate && !isGood) { goodPlate = false; }
-		int scoreToAdd = isGood ? 100 : -100;
+		if (goodPlate && !ingredientsMatched) { goodPlate = false; }
+		int scoreToAdd = ingredientsMatched ? 100 : -100;
 		gameController.AddToScore (scoreToAdd);
+	}
+
+	public void ShowEnjoyText () {
+
+		if (ingredientsNeeded.Count == 0) {
+
+			andEnjoyAnimator.SetTrigger ("Move");
+		}
+	}
+
+	public void SlidePlate () {
+
+		if (ingredientsNeeded.Count == 0) {
+			
+			this.GetComponent<Animator>().SetBool("Slide", true);
+		}
+	}
+
+	public bool isIngredientRight (IngredientType ingredientAdded) {
+
+		return (ingredientRequired == ingredientAdded);
 	}
 
 //	public void SpawnIngredients () {
