@@ -19,6 +19,12 @@ public class GameController : MonoBehaviour {
     bool endGame = false;
     bool gameStarted = false;
 
+
+	void Start () {
+
+		Screen.SetResolution (10, 1920, false);
+	}
+
 	void Update () {
 
         if (gameTime > 0 && gameStarted) {
