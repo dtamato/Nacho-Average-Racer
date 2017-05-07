@@ -22,7 +22,7 @@ public class GameController : MonoBehaviour {
 
 	void Start () {
 
-		Screen.SetResolution (10, 1920, false);
+		Screen.SetResolution (1080, 1920, false);
 	}
 
 	void Update () {
