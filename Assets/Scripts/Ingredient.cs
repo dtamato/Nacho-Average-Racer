@@ -12,54 +12,53 @@ public enum ExtraTopping {
 };
 
 [DisallowMultipleComponent]
-[RequireComponent(typeof(Collider2D), typeof(Rigidbody2D))]
+[RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Ingredient : MonoBehaviour {
 
 	[SerializeField] string ingredientName;
-	//[SerializeField] ExtraTopping toppingType;
 	[SerializeField] bool isGood;
 	[SerializeField] Sprite inNachosSprite;
 	[SerializeField] Sprite silhoutteSprite;
+	[SerializeField] GameObject droppedVersion;
 	[SerializeField] GameObject opposingIngredient;
 	[SerializeField] GameObject scoreCanvasPrefab;
 
     GameObject topRecipeBox;
     GameObject bottomRecipeBox;
-
 	bool canDrag;
 
 
 	void Awake () {
-
-		ResetIngredient ();
+		
         topRecipeBox = GameObject.FindGameObjectWithTag("TopRecipe");
         bottomRecipeBox = GameObject.FindGameObjectWithTag("BottomRecipe");
+		ResetIngredient ();
     }
 
 	void OnMouseDrag () {
 
 		if (Input.GetMouseButton (0) && canDrag) {
 			
-			Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-			mouseWorldPosition = new Vector3 (mouseWorldPosition.x, mouseWorldPosition.y, 0);
+			Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint (new Vector3(Input.mousePosition.x, Input.mousePosition.y, 9));
+			mouseWorldPosition = new Vector3 (mouseWorldPosition.x, mouseWorldPosition.y, this.transform.position.z);
 			this.transform.position = mouseWorldPosition;
 		}
 	}
 
-	void OnTriggerStay2D(Collider2D other) {
+	void OnTriggerStay(Collider other) {
 
 		if (other.CompareTag ("Plate")) {
 
 			float distance = Vector3.Distance (this.transform.position, other.transform.position);
-
-			if (canDrag && distance < 0.5f) {
+			//Debug.Log ("distance: " + distance);
+			if (canDrag && distance < 2.5f) {
 				
 				canDrag = false;
 
 				GameObject newScoreCanvas = Instantiate (scoreCanvasPrefab, this.transform.position + Vector3.up, Quaternion.identity) as GameObject;
 				newScoreCanvas.GetComponentInChildren<ScoreCanvas> ().SetSprite (isGood);
 
-				other.GetComponentInChildren<PlateController> ().AddIngredient (inNachosSprite, isGood);
+				other.GetComponentInChildren<PlateController> ().AddIngredient (droppedVersion, isGood);
 				this.transform.GetChild (0).gameObject.SetActive (false);
 				this.transform.position = Vector3.zero;
 

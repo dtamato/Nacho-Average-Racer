@@ -10,6 +10,7 @@ public class PlateController : MonoBehaviour {
 	[SerializeField] SpriteRenderer silhoutteImage;
 	[SerializeField] Transform[] spawnTransforms;
 	[SerializeField] GameController gameController;
+	[SerializeField] IngredientDropper ingredientDropper;
 
 	[Header("Ingredients")]
 	[SerializeField] GameObject chipsPrefab;
@@ -58,7 +59,7 @@ public class PlateController : MonoBehaviour {
 	void AddExtraToppings () {
 
 		List<GameObject> extraToppingsList = toppingsList;
-		int extraToppingsCount = Random.Range (0, (int)ExtraTopping.ToppingsCount);
+		int extraToppingsCount = Random.Range (1, (int)ExtraTopping.ToppingsCount);
 
 		for (int i = 0; i < extraToppingsCount; i++) {
 
@@ -149,17 +150,23 @@ public class PlateController : MonoBehaviour {
 		return spawnTransform;
 	}
 
-	public void AddIngredient (Sprite inNachosSprite, bool isGood) {
+	public void AddIngredient (GameObject ingredientDrop, bool isGood) {
 
 		this.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = null;
 
-		GameObject newIngredient = new GameObject ();
-		newIngredient.AddComponent(typeof(SpriteRenderer));
-		newIngredient.GetComponent<SpriteRenderer> ().sprite = inNachosSprite;
-		newIngredient.GetComponent<SpriteRenderer> ().sortingOrder = this.transform.childCount + 1;
-		newIngredient.transform.SetParent (this.transform);
-		newIngredient.transform.localScale = 0.5f * Vector3.one;
-		newIngredient.name = inNachosSprite.name;
+//		GameObject newIngredient = new GameObject ();
+//		newIngredient.AddComponent(typeof(SpriteRenderer));
+//		newIngredient.GetComponent<SpriteRenderer> ().sprite = inNachosSprite;
+//		newIngredient.GetComponent<SpriteRenderer> ().sortingOrder = this.transform.childCount + 1;
+//		newIngredient.transform.SetParent (this.transform);
+//		newIngredient.transform.localScale = 0.5f * Vector3.one;
+//		newIngredient.name = inNachosSprite.name;
+
+		ingredientDropper.SetObject (ingredientDrop);
+		ingredientDropper.gameObject.SetActive (true);
+		ingredientDropper.DropStuff ();
+
+
 		if (goodPlate && !isGood) { goodPlate = false; }
 		int scoreToAdd = isGood ? 100 : -100;
 		gameController.AddToScore (scoreToAdd);
