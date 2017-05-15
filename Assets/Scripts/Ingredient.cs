@@ -64,9 +64,12 @@ public class Ingredient : MonoBehaviour {
 
 		if (other.CompareTag ("Plate")) {
 
-			float distance = Vector3.Distance (this.transform.position, other.transform.position);
-			//Debug.Log ("distance: " + distance);
-			if (canDrag && distance < 2.5f) {
+			Bounds ingredientBounds = this.GetComponent<Collider> ().bounds;
+			Bounds plateBounds = other.GetComponent<Collider> ().bounds;
+			bool ingredientInside = ingredientBounds.min.x > plateBounds.min.x && ingredientBounds.max.x < plateBounds.max.x && 
+									ingredientBounds.min.y > plateBounds.min.y && ingredientBounds.max.y < plateBounds.max.y;
+			
+			if (canDrag && ingredientInside) {
 				
 				canDrag = false;
 
